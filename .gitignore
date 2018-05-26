@@ -1,0 +1,7 @@
+.DS_Store
+*.pyc
+scripts/data/*
+scripts/pickles/*
+.ipynb_checkpoints/*
+scripts/.ipynb_checkpoints/*
+*~
