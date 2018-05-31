@@ -16,6 +16,9 @@ We're trying to visualize various forms of data from our health record to obtain
 * CSV reading is mostly ready :O 
 * `pandas` dataframe things are almost ready? May take significantly longer
 
+## Interesting Findings
+* The year 2011 is really hard to parse because there are periods of just straight up data entry from previous years, such that the total number of patients that year is greater than the total number of patients in like 2017. :/ 
+
 
 ## Todo 
 * Determine a new report generating structure to make data extraction easy

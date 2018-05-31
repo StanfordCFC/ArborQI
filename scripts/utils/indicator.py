@@ -42,17 +42,17 @@ def complete_qisummary(df, key_value=None):
     return 
 
 
-def temporal_distribution(df):
+def temporal_distribution(df, ts_name = 'ts'):
 	'''
 
 	'''
-	time_gb = df.groupby(df['ts'].dt.weekofyear)
-	#plt.figure()
-	#time_gb.plot()
-	#plt.show()
+	time_gb = df.groupby(df[ts_name].dt.weekofyear)
+	plt.figure()
+	time_gb.plot()
+	plt.show()
 
-	for key, item in time_gb:
-		print time_gb.get_group(key), "\n\n"
+# 	for key, item in time_gb:
+# 		print time_gb.get_group(key), "\n\n"
 
 
 def visits_paradigm(df):
