@@ -27,7 +27,7 @@ def complete_qisummary(df, key_value=None):
                 if key_qi in df:
                     print df.groupby(key_qi).size()
                     plt.figure()
-                    df.groupby(key_qi).size().plot(kind='bar')
+                    df.groupby(key_qi).size()
                     plt.show()
 
                 else:
