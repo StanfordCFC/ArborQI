@@ -44,6 +44,24 @@ def process_qi_csv(path_to_qi_csv):
 	return {'arbor':arbor_qi, 'pfc':pfc_qi}
 
 
+def process_qi_csv_preselect(path_to_qi_csv):
+	'''
+	'''
+
+	print '--------------------------------'
+	print 'processing visits dataframe'
+
+	df_qi= returnDF(path_to_qi_csv)
+	df_qi['VisitDateTimeTS'] = pd.to_datetime((df_qi['VisitDate']))
+	df_qi.index = df_qi['VisitDateTimeTS']
+	#df_qi = df_qi.iloc[::-1]
+	del df_qi['VisitDate']
+
+	print df_qi.describe()
+
+	return df_qi
+
+
 def process_visits_csv(path_to_flow_csv):
 	'''
 	'''
@@ -163,7 +181,7 @@ def qi_extractor(df, period='mom', keys=None):
 	print '------------------------------------------'
 	print 'preparing to generate full qi summary text'
 
-	
+	print df.head()
 	# qi keys 
 	qi_columns = ['QIDiabetes', 'QIDiabetesA1C', 'QIDiabetesFoot', 'QIDiabetesOphtho', 'QIDiabetesPneumovax',
 			  'QIMammo', 'QIMentalHealth1', 'QIMentalHealth2', 'QIMicroalbumin',
@@ -197,7 +215,7 @@ def qi_extractor(df, period='mom', keys=None):
 	
 	if period == 'mom':
 		months = [val for val in range(1, 13)]
-		years = [2017, 2018]
+		years = [ 2018]
 		time_points = []
 		
 		for year in years:
@@ -215,7 +233,7 @@ def qi_extractor(df, period='mom', keys=None):
 				filtered = time_filter(tp1,tp2, df)
 
 				if filtered.values.shape[0] == 0:
-					print 'No QI data for this time point'
+					print 'No QI data between these time points:', tp1, tp2
 					continue
 
 				else:
@@ -225,7 +243,7 @@ def qi_extractor(df, period='mom', keys=None):
 						for mapped_key, num_patients in response_dict.iteritems():
 							total_responses[key_qi][mapped_key].append(num_patients)
 							
-					time_points.append(str(tp1[1]) + '/' + str(tp1[0]) + ' - ' + str(tp2[1]) + '/' + str(tp2[0]))
+					time_points.append(str(tp1[1]) + '/' + str(tp1[0]))
 
 	return (total_responses, time_points)
 				
@@ -283,26 +301,29 @@ def QI_processing(path_to_qi_csv):
 	'''
 
 	
-	qi_dfs = process_qi_csv(path_to_qi_csv)
-	results_dict = {loc:[] for loc in qi_dfs.keys()}
+	qi_df = process_qi_csv_preselect(path_to_qi_csv)
 
-	for loc, qi_df in qi_dfs.iteritems():
-		grouped_data, time_points = qi_extractor(qi_df)
-		extracted_qi_df_dict = {key_qi:pd.DataFrame(mom, index = time_points) for key_qi, mom in grouped_data.iteritems()}
-		for key_qi, df in extracted_qi_df_dict.iteritems():
-			df.index.name = 'time_point'
-		results_dict[loc] = extracted_qi_df_dict
+	grouped_data, time_points = qi_extractor(qi_df)
+	extracted_qi_df_dict = {key_qi:pd.DataFrame(mom, index = time_points) for key_qi, mom in grouped_data.iteritems()}
+	for key_qi, df in extracted_qi_df_dict.iteritems():
+		df.index.name = 'time_point'
 
-	write_to_pickle('qi_results_dict_mom', results_dict)
 
-	return (results_dict, time_points)
+	return (extracted_qi_df_dict, time_points)
 
 
 def main():
-	path_to_qi_csv = "data/QIdudes.csv"
+	# path_to_qi_csv = "data/QIdudes.csv"
 	# path_to_flow_csv = 
 
-	results_dict, time_points = QI_processing(path_to_qi_csv)
+	path_to_qi_csv_arbor = "data/QI_summer_2018_raw_arbor.csv"
+	path_to_qi_csv_pfc = "data/QI_summer_2018_raw_pfc.csv"
+
+	extracted_arbor, _ = QI_processing(path_to_qi_csv_arbor)
+	extracted_pfc, _ = QI_processing(path_to_qi_csv_pfc)
+
+	results_dict = {'arbor': extracted_arbor, 'pfc': extracted_pfc}
+	write_to_pickle('qi_results_dict_mom', results_dict)
 
 	fuse_diabetes_df(results_dict)
 
