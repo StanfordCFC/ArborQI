@@ -5,9 +5,13 @@
 
 import numpy
 import pandas as pd 
+import sys
+import argparse
 import csv 
+
 from utils.file_ops import * 
 from datetime import datetime
+
 
 def time_filter(t1, t2, df):
 	'''
@@ -311,13 +315,33 @@ def QI_processing(path_to_qi_csv):
 
 	return (extracted_qi_df_dict, time_points)
 
+def parse_command_line(args):
+	'''
+
+	'''
+	
+	print 'parsing command line'
+
+	parser = argparse.ArgumentParser(description='lol')
+	parser.add_argument('--raw_arbor', action="store", type=str)
+	parser.add_argument('--raw_pfc', action="store", type=str)
+	
+	args = vars(parser.parse_args())
+
+	return args
 
 def main():
+
+	args = parse_command_line(sys.argv)
+
 	# path_to_qi_csv = "data/QIdudes.csv"
 	# path_to_flow_csv = 
 
-	path_to_qi_csv_arbor = "data/QI_summer_2018_raw_arbor.csv"
-	path_to_qi_csv_pfc = "data/QI_summer_2018_raw_pfc.csv"
+	# path_to_qi_csv_arbor = "data/QI_summer_2018_raw_arbor.csv"
+	# path_to_qi_csv_pfc = "data/QI_summer_2018_raw_pfc.csv"
+
+	path_to_qi_csv_arbor = args['raw_arbor']
+	path_to_qi_csv_pfc = args['raw_pfc']
 
 	extracted_arbor, _ = QI_processing(path_to_qi_csv_arbor)
 	extracted_pfc, _ = QI_processing(path_to_qi_csv_pfc)
